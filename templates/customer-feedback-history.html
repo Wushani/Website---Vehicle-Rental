@@ -1,0 +1,781 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AutoLanka - Feedback History</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-dark: #2c3e50;
+            --primary-light: #3498db;
+            --customer-color: #2ecc71;
+            --staff-color: #3498db;
+            --accent-color: #e67e22;
+            --card-bg: rgba(255, 255, 255, 0.92);
+            --header-gradient-start: #2c3e50;
+            --header-gradient-end: #4a6484;
+        }
+
+        body {
+            background: linear-gradient(135deg, var(--header-gradient-start) 0%, var(--header-gradient-end) 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            padding: 20px 0;
+            position: relative;
+            overflow-x: hidden;
+            margin: 0;
+        }
+
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiPjxkZWZzPjxwYXR0ZXJuIGlkPSJwYXR0ZXJuIiB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHBhdHRlcm5Vbml0cz0idXNlclNwYWNlT25Vc2UiIHBhdHRlcm5UcmFuc2Zvcm09InJvdGF0ZSg0NSkiPjxjaXJjbGUgY3g9IjIwIiBjeT0iMjAiIHI9IjAuNSIgZmlsbD0iI2ZmZiIgZmlsbC1vcGFjaXR5PSIwLjEiLz48L3BhdHRlcm4+PC9kZWZzPjxyZWN0IHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIGZpbGw9InVybCgjcGF0dGVybikiLz48L3N2Zz4=');
+            opacity: 0.1;
+        }
+
+        .selection-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(15px);
+            border-radius: 25px;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.25);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            overflow: hidden;
+            position: relative;
+            z-index: 2;
+            max-width: 1200px;
+            margin: 20px auto;
+        }
+
+        .portal-header {
+            background: linear-gradient(135deg, var(--header-gradient-start), var(--primary-light));
+            color: white;
+            text-align: center;
+            padding: 2.5rem 2rem;
+            margin: -1.5rem -1.5rem 1.5rem -1.5rem;
+            border-radius: 25px 25px 0 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .portal-header::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 70%);
+            transform: rotate(30deg);
+        }
+
+        .portal-icon {
+            font-size: 3.5rem;
+            margin-bottom: 1rem;
+            text-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        .portal-section {
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            border: none;
+            position: relative;
+            z-index: 1;
+        }
+
+        .portal-section:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+        }
+
+        .portal-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+        }
+
+        .customer-portal::before { background: linear-gradient(90deg, var(--customer-color), #27ae60); }
+        .staff-portal::before { background: linear-gradient(90deg, var(--staff-color), #2980b9); }
+
+        .portal-title {
+            font-weight: 700;
+            margin-bottom: 0.8rem;
+            font-size: 1.5rem;
+            color: var(--primary-dark);
+            text-align: center;
+        }
+
+        .portal-subtitle {
+            text-align: center;
+            margin-bottom: 1.5rem;
+            color: #6c757d;
+        }
+
+        .portal-description {
+            font-size: 0.95rem;
+            line-height: 1.6;
+            margin-bottom: 1.5rem;
+            color: #7f8c8d;
+            text-align: center;
+        }
+
+        .portal-btn {
+            border-radius: 30px;
+            padding: 14px 30px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            border: none;
+            font-size: 1.05rem;
+            letter-spacing: 0.5px;
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+            width: 100%;
+            max-width: 300px;
+            margin: 0 auto;
+        }
+
+        .portal-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, rgba(255,255,255,0.2), rgba(255,255,255,0));
+            z-index: -1;
+            transition: all 0.3s ease;
+        }
+
+        .portal-btn:hover {
+            transform: translateY(-3px);
+            text-decoration: none;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+        }
+
+        .portal-btn:hover::before {
+            background: linear-gradient(45deg, rgba(255,255,255,0.3), rgba(255,255,255,0.1));
+        }
+
+        .customer-btn { 
+            background: linear-gradient(135deg, var(--customer-color), #27ae60);
+            box-shadow: 0 5px 15px rgba(46, 204, 113, 0.4);
+            color: white;
+        }
+        
+        .staff-btn { 
+            background: linear-gradient(135deg, var(--staff-color), #2980b9);
+            box-shadow: 0 5px 15px rgba(52, 152, 219, 0.4);
+            color: white;
+        }
+
+        .back-link {
+            display: block;
+            text-align: center;
+            margin-top: 1.5rem;
+            color: #7f8c8d;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            padding: 12px;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.7);
+        }
+
+        .back-link:hover {
+            color: var(--primary-light);
+            text-decoration: none;
+            background: rgba(255, 255, 255, 0.9);
+            transform: translateY(-2px);
+        }
+        
+        .section-title {
+            position: relative;
+            padding-bottom: 12px;
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+            text-align: center;
+        }
+        
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 3px;
+            background: var(--accent-color);
+            border-radius: 2px;
+        }
+        
+        .card-subtitle {
+            font-size: 1rem;
+            opacity: 0.9;
+            margin-bottom: 1.5rem;
+            text-align: center;
+            color: rgba(255, 255, 255, 0.9);
+        }
+        
+        .role-description {
+            text-align: center;
+            margin-bottom: 2rem;
+            color: #7f8c8d;
+        }
+        
+        /* Form styling */
+        .form-control, .form-select {
+            border: 2px solid #e9ecef;
+            border-radius: 12px;
+            padding: 12px 15px;
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus, .form-select:focus {
+            border-color: var(--primary-light);
+            box-shadow: 0 0 0 0.2rem rgba(52, 152, 219, 0.25);
+        }
+
+        .form-label {
+            font-weight: 600;
+            color: var(--primary-dark);
+            margin-bottom: 8px;
+        }
+
+        .rating-display {
+            color: #ffc107;
+        }
+
+        .btn-feedback {
+            background: linear-gradient(135deg, #27ae60, #2ecc71);
+            border: none;
+            border-radius: 12px;
+            padding: 15px 30px;
+            font-weight: 600;
+            font-size: 1.1rem;
+            width: 100%;
+            transition: all 0.3s ease;
+        }
+
+        .btn-feedback:hover {
+            background: linear-gradient(135deg, #2ecc71, #27ae60);
+            transform: translateY(-3px);
+            box-shadow: 0 12px 25px rgba(39, 174, 96, 0.4);
+        }
+
+        .btn-register-new {
+            background: linear-gradient(135deg, var(--accent-color), #e67e22);
+            border: none;
+            border-radius: 12px;
+            padding: 12px 25px;
+            font-weight: 600;
+            color: white;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .btn-register-new:hover {
+            background: linear-gradient(135deg, #e67e22, var(--accent-color));
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(230, 126, 34, 0.4);
+            color: white;
+            text-decoration: none;
+        }
+
+        .alert {
+            border-radius: 12px;
+            border: none;
+            font-weight: 500;
+        }
+        
+        /* Action button styling */
+        .btn-action {
+            border: none;
+            border-radius: 12px;
+            padding: 8px 15px;
+            font-weight: 600;
+            color: white;
+            transition: all 0.3s ease;
+            margin-left: 5px;
+        }
+
+        .btn-delete {
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+        }
+
+        .btn-delete:hover {
+            background: linear-gradient(135deg, #c0392b, #e74c3c);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(231, 76, 60, 0.4);
+        }
+        
+        .btn-edit {
+            background: linear-gradient(135deg, #3498db, #2980b9);
+        }
+
+        .btn-edit:hover {
+            background: linear-gradient(135deg, #2980b9, #3498db);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(52, 152, 219, 0.4);
+        }
+        
+        /* Edit modal styling */
+        .modal-content {
+            border-radius: 20px;
+            border: none;
+        }
+        
+        .modal-header {
+            background: linear-gradient(135deg, var(--header-gradient-start), var(--primary-light));
+            color: white;
+            border-radius: 20px 20px 0 0;
+            border: none;
+        }
+        
+        .modal-body {
+            background: var(--card-bg);
+        }
+        
+        .modal-footer {
+            background: var(--card-bg);
+            border-radius: 0 0 20px 20px;
+            border: none;
+        }
+        
+        /* Rating stars for edit form */
+        .edit-rating-stars {
+            font-size: 1.5rem;
+            color: #ddd;
+            cursor: pointer;
+        }
+
+        .edit-rating-stars .fas {
+            transition: color 0.2s;
+        }
+
+        .edit-rating-stars .fas.active {
+            color: #ffc107;
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .portal-header {
+                padding: 2rem 1.5rem;
+            }
+            
+            .portal-icon {
+                font-size: 3rem;
+            }
+            
+            .section-title {
+                font-size: 1.3rem;
+            }
+            
+            .card-body {
+                padding: 1.5rem !important;
+            }
+            
+            .btn-action {
+                margin: 5px 0;
+                display: block;
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="container-fluid">
+    <div class="row justify-content-center">
+        <div class="col-12">
+            <div class="card selection-card">
+                <div class="card-body p-4 p-md-5">
+                    <div class="portal-header">
+                        <i class="fas fa-history portal-icon"></i>
+                        <h1 class="mb-2">Feedback History</h1>
+                        <p class="mb-0 card-subtitle">View all your submitted feedback</p>
+                    </div>
+
+                    <div class="text-center mb-4">
+                        <h3 class="section-title">Feedback Portal</h3>
+                        <p class="role-description">Review your feedback submissions</p>
+                    </div>
+
+                    <a href="/customer/dashboard" class="back-link">
+                        <i class="fas fa-arrow-left me-2"></i>Back to Dashboard
+                    </a>
+
+                    <div class="row justify-content-center">
+                        <div class="col-lg-10">
+                            <!-- Feedback List -->
+                            <div class="portal-section customer-portal">
+                                <div class="text-center mb-4">
+                                    <h4 class="portal-title">
+                                        <i class="fas fa-list me-2"></i>Your Feedback
+                                    </h4>
+                                    <p class="portal-subtitle">All your submitted feedback</p>
+                                </div>
+                                
+                                <div th:if="${feedbackList != null and !feedbackList.empty}">
+                                    <div th:each="feedback : ${feedbackList}" class="mb-4 pb-4 border-bottom">
+                                        <div class="d-flex justify-content-between align-items-center mb-2">
+                                            <strong th:text="${feedback.booking != null ? 'Booking #' + feedback.booking.bookingId : 'General Feedback'}">Booking #12345</strong>
+                                            <div class="d-flex">
+                                                <span class="text-muted me-3" th:text="${#temporals.format(feedback.createdDate, 'MMM dd, yyyy')}">Sep 15, 2025</span>
+                                                <button class="btn btn-action btn-edit" th:attr="data-feedback-id=${feedback.feedbackId}">
+                                                    <i class="fas fa-edit me-1"></i>Edit
+                                                </button>
+                                                <button class="btn btn-action btn-delete" th:attr="data-feedback-id=${feedback.feedbackId}">
+                                                    <i class="fas fa-trash me-1"></i>Delete
+                                                </button>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="mb-2">
+                                            <span class="me-3">Overall Rating:</span>
+                                            <span class="rating-display">
+                                                <span th:each="i : ${#numbers.sequence(1, 5)}">
+                                                    <i th:class="${i <= feedback.overallRating} ? 'fas fa-star' : 'far fa-star'"></i>
+                                                </span>
+                                                <span th:text="${feedback.overallRating + '/5'}" class="ms-1">4/5</span>
+                                            </span>
+                                        </div>
+                                        
+                                        <div th:if="${feedback.vehicleConditionRating != null}" class="mb-2">
+                                            <span class="me-3">Vehicle Condition:</span>
+                                            <span class="rating-display">
+                                                <span th:each="i : ${#numbers.sequence(1, 5)}">
+                                                    <i th:class="${i <= feedback.vehicleConditionRating} ? 'fas fa-star' : 'far fa-star'"></i>
+                                                </span>
+                                                <span th:text="${feedback.vehicleConditionRating + '/5'}" class="ms-1">4/5</span>
+                                            </span>
+                                        </div>
+                                        
+                                        <div th:if="${feedback.cleanlinessRating != null}" class="mb-2">
+                                            <span class="me-3">Cleanliness:</span>
+                                            <span class="rating-display">
+                                                <span th:each="i : ${#numbers.sequence(1, 5)}">
+                                                    <i th:class="${i <= feedback.cleanlinessRating} ? 'fas fa-star' : 'far fa-star'"></i>
+                                                </span>
+                                                <span th:text="${feedback.cleanlinessRating + '/5'}" class="ms-1">5/5</span>
+                                            </span>
+                                        </div>
+                                        
+                                        <div th:if="${feedback.valueRating != null}" class="mb-3">
+                                            <span class="me-3">Value for Money:</span>
+                                            <span class="rating-display">
+                                                <span th:each="i : ${#numbers.sequence(1, 5)}">
+                                                    <i th:class="${i <= feedback.valueRating} ? 'fas fa-star' : 'far fa-star'"></i>
+                                                </span>
+                                                <span th:text="${feedback.valueRating + '/5'}" class="ms-1">4/5</span>
+                                            </span>
+                                        </div>
+                                        
+                                        <div th:if="${feedback.comments != null and !feedback.comments.empty}" class="mb-2">
+                                            <strong>Comments:</strong>
+                                            <p class="mb-0 text-muted" th:text="${feedback.comments}">Great service and well-maintained vehicle.</p>
+                                        </div>
+                                        
+                                        <div th:if="${feedback.suggestions != null and !feedback.suggestions.empty}" class="mb-0">
+                                            <strong>Suggestions:</strong>
+                                            <p class="mb-0 text-muted" th:text="${feedback.suggestions}">Consider adding GPS navigation systems.</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div th:if="${feedbackList == null or feedbackList.empty}" class="text-center py-5">
+                                    <i class="fas fa-comment-slash fa-3x text-muted mb-3"></i>
+                                    <h5 class="text-muted">No feedback submitted yet</h5>
+                                    <p class="text-muted">You haven't submitted any feedback. Share your experience to help us improve!</p>
+                                    <a href="/customer/feedback/submit" class="btn btn-primary btn-feedback">
+                                        <i class="fas fa-plus me-2"></i>Submit Feedback
+                                    </a>
+                                </div>
+                            </div>
+                            
+                            <!-- Navigation -->
+                            <div class="d-grid gap-2">
+                                <a href="/customer/feedback/submit" class="btn btn-success btn-feedback">
+                                    <i class="fas fa-plus me-2"></i>Submit New Feedback
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Feedback Modal -->
+<div class="modal fade" id="editFeedbackModal" tabindex="-1" aria-labelledby="editFeedbackModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editFeedbackModalLabel">Edit Feedback</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="editFeedbackForm">
+                    <input type="hidden" id="editFeedbackId" name="feedbackId">
+                    
+                    <!-- Overall Rating -->
+                    <div class="mb-4">
+                        <label class="form-label">Overall Rating</label>
+                        <div class="edit-rating-stars text-center" data-name="editOverallRating">
+                            <span class="fas fa-star" data-rating="1"></span>
+                            <span class="fas fa-star" data-rating="2"></span>
+                            <span class="fas fa-star" data-rating="3"></span>
+                            <span class="fas fa-star" data-rating="4"></span>
+                            <span class="fas fa-star" data-rating="5"></span>
+                        </div>
+                        <div class="text-center mt-2">
+                            <span id="editRatingText">Select a rating</span>
+                        </div>
+                        <input type="hidden" id="editOverallRating" name="overallRating" value="0" required>
+                    </div>
+                    
+                    <!-- Detailed Ratings -->
+                    <div class="mb-4">
+                        <label class="form-label">Detailed Ratings</label>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Vehicle Condition</label>
+                            <div class="edit-rating-stars" data-name="editVehicleConditionRating">
+                                <span class="fas fa-star" data-rating="1"></span>
+                                <span class="fas fa-star" data-rating="2"></span>
+                                <span class="fas fa-star" data-rating="3"></span>
+                                <span class="fas fa-star" data-rating="4"></span>
+                                <span class="fas fa-star" data-rating="5"></span>
+                            </div>
+                            <input type="hidden" id="editVehicleConditionRating" name="vehicleConditionRating" value="0">
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Cleanliness</label>
+                            <div class="edit-rating-stars" data-name="editCleanlinessRating">
+                                <span class="fas fa-star" data-rating="1"></span>
+                                <span class="fas fa-star" data-rating="2"></span>
+                                <span class="fas fa-star" data-rating="3"></span>
+                                <span class="fas fa-star" data-rating="4"></span>
+                                <span class="fas fa-star" data-rating="5"></span>
+                            </div>
+                            <input type="hidden" id="editCleanlinessRating" name="cleanlinessRating" value="0">
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Value for Money</label>
+                            <div class="edit-rating-stars" data-name="editValueRating">
+                                <span class="fas fa-star" data-rating="1"></span>
+                                <span class="fas fa-star" data-rating="2"></span>
+                                <span class="fas fa-star" data-rating="3"></span>
+                                <span class="fas fa-star" data-rating="4"></span>
+                                <span class="fas fa-star" data-rating="5"></span>
+                            </div>
+                            <input type="hidden" id="editValueRating" name="valueRating" value="0">
+                        </div>
+                    </div>
+                    
+                    <!-- Comments -->
+                    <div class="mb-4">
+                        <label for="editComments" class="form-label">Comments</label>
+                        <textarea class="form-control" id="editComments" name="comments" rows="5" placeholder="Share your detailed experience, suggestions, or any issues you encountered..."></textarea>
+                    </div>
+                    
+                    <!-- Suggestions -->
+                    <div class="mb-4">
+                        <label for="editSuggestions" class="form-label">Suggestions for Improvement</label>
+                        <textarea class="form-control" id="editSuggestions" name="suggestions" rows="3" placeholder="How can we make your experience better?"></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="saveFeedbackBtn">Save Changes</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    // Add event listeners to delete buttons
+    document.addEventListener('DOMContentLoaded', function() {
+        const deleteButtons = document.querySelectorAll('.btn-delete');
+        const editButtons = document.querySelectorAll('.btn-edit');
+        
+        deleteButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const feedbackId = this.getAttribute('data-feedback-id');
+                
+                // Show confirmation dialog
+                if (confirm('Are you sure you want to delete this feedback? This action cannot be undone.')) {
+                    // Send delete request
+                    fetch('/customer/feedback/delete', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded',
+                        },
+                        body: 'feedbackId=' + feedbackId
+                    })
+                    .then(response => response.text())
+                    .then(data => {
+                        alert(data);
+                        // Reload the page to reflect changes
+                        location.reload();
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert('Error deleting feedback. Please try again.');
+                    });
+                }
+            });
+        });
+        
+        // Add event listeners to edit buttons
+        editButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const feedbackId = this.getAttribute('data-feedback-id');
+                
+                // Fetch feedback data for editing
+                fetch('/customer/feedback/edit?feedbackId=' + feedbackId)
+                .then(response => response.json())
+                .then(feedback => {
+                    if (feedback) {
+                        // Populate the edit form with existing feedback data
+                        document.getElementById('editFeedbackId').value = feedback.feedbackId;
+                        document.getElementById('editOverallRating').value = feedback.overallRating;
+                        document.getElementById('editVehicleConditionRating').value = feedback.vehicleConditionRating || 0;
+                        document.getElementById('editCleanlinessRating').value = feedback.cleanlinessRating || 0;
+                        document.getElementById('editValueRating').value = feedback.valueRating || 0;
+                        document.getElementById('editComments').value = feedback.comments || '';
+                        document.getElementById('editSuggestions').value = feedback.suggestions || '';
+                        
+                        // Update star ratings display
+                        updateStarDisplay('editOverallRating', feedback.overallRating);
+                        updateStarDisplay('editVehicleConditionRating', feedback.vehicleConditionRating);
+                        updateStarDisplay('editCleanlinessRating', feedback.cleanlinessRating);
+                        updateStarDisplay('editValueRating', feedback.valueRating);
+                        
+                        // Update rating text
+                        const ratingLabels = ['Poor', 'Fair', 'Good', 'Very Good', 'Excellent'];
+                        document.getElementById('editRatingText').textContent = feedback.overallRating ? ratingLabels[feedback.overallRating - 1] : 'Select a rating';
+                        
+                        // Show the modal
+                        const editModal = new bootstrap.Modal(document.getElementById('editFeedbackModal'));
+                        editModal.show();
+                    } else {
+                        alert('Error loading feedback data.');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Error loading feedback data. Please try again.');
+                });
+            });
+        });
+        
+        // Save feedback button event listener
+        document.getElementById('saveFeedbackBtn').addEventListener('click', function() {
+            // Create form data object
+            const formData = new FormData();
+            formData.append('feedbackId', document.getElementById('editFeedbackId').value);
+            formData.append('overallRating', document.getElementById('editOverallRating').value);
+            formData.append('vehicleConditionRating', document.getElementById('editVehicleConditionRating').value);
+            formData.append('cleanlinessRating', document.getElementById('editCleanlinessRating').value);
+            formData.append('valueRating', document.getElementById('editValueRating').value);
+            formData.append('comments', document.getElementById('editComments').value);
+            formData.append('suggestions', document.getElementById('editSuggestions').value);
+            
+            // Send update request
+            fetch('/customer/feedback/update', {
+                method: 'POST',
+                body: new URLSearchParams(formData)
+            })
+            .then(response => response.text())
+            .then(data => {
+                alert(data);
+                // Reload the page to reflect changes
+                location.reload();
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error updating feedback. Please try again.');
+            });
+        });
+        
+        // Edit rating star interaction
+        document.querySelectorAll('.edit-rating-stars').forEach(container => {
+            const stars = container.querySelectorAll('.fas');
+            const hiddenInput = document.getElementById(container.getAttribute('data-name'));
+            stars.forEach(star => {
+                star.addEventListener('click', function() {
+                    const rating = parseInt(this.getAttribute('data-rating'));
+                    
+                    // Update stars in this container
+                    stars.forEach((s, index) => {
+                        if (index < rating) {
+                            s.classList.add('active');
+                        } else {
+                            s.classList.remove('active');
+                        }
+                    });
+                    
+                    // Update hidden input value
+                    if (hiddenInput) {
+                        hiddenInput.value = rating;
+                    }
+                    
+                    // Update rating text if it's the overall rating
+                    if (container.getAttribute('data-name') === 'editOverallRating') {
+                        const ratingText = document.getElementById('editRatingText');
+                        const ratingLabels = ['Poor', 'Fair', 'Good', 'Very Good', 'Excellent'];
+                        ratingText.textContent = ratingLabels[rating - 1];
+                    }
+                });
+            });
+        });
+    });
+    
+    // Function to update star display based on rating value
+    function updateStarDisplay(fieldName, ratingValue) {
+        if (ratingValue !== null && ratingValue !== undefined) {
+            const container = document.querySelector('.edit-rating-stars[data-name="' + fieldName + '"]');
+            if (container) {
+                const stars = container.querySelectorAll('.fas');
+                stars.forEach((star, index) => {
+                    if (index < ratingValue) {
+                        star.classList.add('active');
+                    } else {
+                        star.classList.remove('active');
+                    }
+                });
+            }
+        }
+    }
+</script>
+</body>
+</html>

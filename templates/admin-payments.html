@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AutoLanka - Admin Payment Management</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+        }
+
+        body {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            min-height: 100vh;
+        }
+
+        .dashboard-header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            margin-bottom: 2rem;
+            padding: 2rem;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .management-card {
+            background: white;
+            border-radius: 15px;
+            border: none;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            height: 100%;
+        }
+
+        .table-container {
+            background: white;
+            border-radius: 15px;
+            padding: 2rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+        }
+
+        .dashboard-title {
+            color: var(--primary-color);
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .dashboard-subtitle {
+            color: #7f8c8d;
+            font-size: 1.2rem;
+        }
+        
+        .status-pending {
+            background-color: #fff3cd;
+            color: #856404;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-weight: bold;
+        }
+        
+        .status-completed {
+            background-color: #d4edda;
+            color: #155724;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-weight: bold;
+        }
+        
+        .status-failed {
+            background-color: #f8d7da;
+            color: #721c24;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-weight: bold;
+        }
+        
+        .status-refunded {
+            background-color: #cce5ff;
+            color: #004085;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container py-5">
+        <!-- Dashboard Header -->
+        <div class="dashboard-header">
+            <i class="fas fa-money-bill-wave fa-4x text-primary mb-3"></i>
+            <h1 class="dashboard-title">Payment Management</h1>
+            <p class="dashboard-subtitle">View all payments in the system</p>
+        </div>
+
+        <!-- Payments Table -->
+        <div class="table-container">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h3><i class="fas fa-credit-card me-2"></i>All Payments</h3>
+                <a href="/admin/dashboard" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left me-2"></i>Back to Dashboard
+                </a>
+            </div>
+            
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>Payment ID</th>
+                            <th>Booking ID</th>
+                            <th>Customer</th>
+                            <th>Amount</th>
+                            <th>Method</th>
+                            <th>Status</th>
+                            <th>Transaction ID</th>
+                            <th>Payment Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="payment : ${payments}">
+                            <td th:text="${payment.paymentId}"></td>
+                            <td th:text="${payment.booking.bookingId}"></td>
+                            <td th:text="${payment.booking.customer.user.firstName + ' ' + payment.booking.customer.user.lastName}"></td>
+                            <td th:text="${'$' + #numbers.formatDecimal(payment.paymentAmount, 1, 2)}"></td>
+                            <td>
+                                <span th:if="${payment.paymentMethod == 'CREDIT_CARD'}">Credit Card</span>
+                                <span th:if="${payment.paymentMethod == 'DEBIT_CARD'}">Debit Card</span>
+                                <span th:if="${payment.paymentMethod == 'BANK_TRANSFER'}">Bank Transfer</span>
+                                <span th:if="${payment.paymentMethod == 'CASH'}">Cash</span>
+                            </td>
+                            <td>
+                                <span th:if="${payment.paymentStatus == 'PENDING'}" class="status-pending">Pending</span>
+                                <span th:if="${payment.paymentStatus == 'COMPLETED'}" class="status-completed">Completed</span>
+                                <span th:if="${payment.paymentStatus == 'FAILED'}" class="status-failed">Failed</span>
+                                <span th:if="${payment.paymentStatus == 'REFUNDED'}" class="status-refunded">Refunded</span>
+                            </td>
+                            <td th:text="${payment.transactionId}"></td>
+                            <td th:text="${#temporals.format(payment.paymentDate, 'yyyy-MM-dd HH:mm')}"></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

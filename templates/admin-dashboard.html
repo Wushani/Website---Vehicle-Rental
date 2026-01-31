@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AutoLanka - Admin Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+        }
+
+        body {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            min-height: 100vh;
+        }
+
+        .dashboard-header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            margin-bottom: 2rem;
+            padding: 2rem;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .management-card {
+            background: white;
+            border-radius: 15px;
+            border: none;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            height: 100%;
+        }
+
+        .management-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.15);
+        }
+
+        .card-icon {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1rem;
+            font-size: 2rem;
+            color: white;
+        }
+
+        .staff-icon { background: linear-gradient(45deg, #28a745, #20c997); }
+        .insurance-icon { background: linear-gradient(45deg, #17a2b8, #6f42c1); }
+        .finance-icon { background: linear-gradient(45deg, #343a40, #6c757d); }
+        .admin-icon { background: linear-gradient(45deg, #dc3545, #fd7e14); }
+        .users-icon { background: linear-gradient(45deg, #6f42c1, #20c997); }
+        .bookings-icon { background: linear-gradient(45deg, #17a2b8, #28a745); }
+        .payments-icon { background: linear-gradient(45deg, #fd7e14, #dc3545); }
+
+        .register-btn {
+            border-radius: 25px;
+            padding: 12px 30px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .register-btn:hover {
+            transform: translateY(-2px);
+            text-decoration: none;
+        }
+
+        .btn-staff { background: #28a745; }
+        .btn-insurance { background: #17a2b8; }
+        .btn-finance { background: #343a40; }
+        .btn-admin { background: #dc3545; }
+        .btn-users { background: #6f42c1; }
+        .btn-bookings { background: #17a2b8; }
+        .btn-payments { background: #fd7e14; }
+
+        .logout-btn {
+            background: var(--primary-color);
+            border: none;
+            padding: 12px 30px;
+            border-radius: 25px;
+            color: white;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .logout-btn:hover {
+            background: var(--secondary-color);
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .dashboard-title {
+            color: var(--primary-color);
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .dashboard-subtitle {
+            color: #7f8c8d;
+            font-size: 1.2rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container py-5">
+        <!-- Dashboard Header -->
+        <div class="dashboard-header">
+            <i class="fas fa-user-shield fa-4x text-primary mb-3"></i>
+            <h1 class="dashboard-title">Admin Dashboard</h1>
+            <p class="dashboard-subtitle">User Management & Registration</p>
+        </div>
+
+        <!-- Management Cards -->
+        <div class="row g-4 mb-5">
+            <!-- Staff Management -->
+            <div class="col-lg-3 col-md-6">
+                <div class="card management-card">
+                    <div class="card-body text-center p-4">
+                        <div class="card-icon staff-icon">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <h4 class="card-title text-success">Company Staff</h4>
+                        <p class="card-text text-muted mb-4">Register and manage company staff members for daily operations and customer service.</p>
+                        <a href="/admin/register/staff" class="btn btn-success register-btn w-100">
+                            <i class="fas fa-user-plus me-2" href="/admin/register/staff"></i>Register Staff
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Insurance Officer Management -->
+            <div class="col-lg-3 col-md-6">
+                <div class="card management-card">
+                    <div class="card-body text-center p-4">
+                        <div class="card-icon insurance-icon">
+                            <i class="fas fa-shield-alt"></i>
+                        </div>
+                        <h4 class="card-title text-info">Insurance Officer</h4>
+                        <p class="card-text text-muted mb-4">Register insurance officers to manage policies, claims, and insurance-related operations.</p>
+                        <a href="/admin/register/insurance-officer" class="btn btn-info register-btn w-100">
+                            <i class="fas fa-user-plus me-2" href="/admin/register/insurance-officer"></i>Register Officer
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Financial Executive Management -->
+            <div class="col-lg-3 col-md-6">
+                <div class="card management-card">
+                    <div class="card-body text-center p-4">
+                        <div class="card-icon finance-icon">
+                            <i class="fas fa-chart-line"></i>
+                        </div>
+                        <h4 class="card-title text-dark">Financial Executive</h4>
+                        <p class="card-text text-muted mb-4">Register financial executives to handle financial operations, reports, and accounting.</p>
+                        <a href="/admin/register/financial-executive" class="btn btn-dark register-btn w-100">
+                            <i class="fas fa-user-plus me-2"></i>Register Executive
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Admin Management -->
+            <div class="col-lg-3 col-md-6">
+                <div class="card management-card">
+                    <div class="card-body text-center p-4">
+                        <div class="card-icon admin-icon">
+                            <i class="fas fa-user-shield"></i>
+                        </div>
+                        <h4 class="card-title text-danger">Administrator</h4>
+                        <p class="card-text text-muted mb-4">Register additional system administrators with full management access and control.</p>
+                        <a href="/admin/register/admin" class="btn btn-danger register-btn w-100">
+                            <i class="fas fa-user-plus me-2"></i>Register Admin
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- User Management -->
+            <div class="col-lg-4 col-md-6">
+                <div class="card management-card">
+                    <div class="card-body text-center p-4">
+                        <div class="card-icon users-icon">
+                            <i class="fas fa-users-cog"></i>
+                        </div>
+                        <h4 class="card-title text-purple">User Management</h4>
+                        <p class="card-text text-muted mb-4">View, manage, and delete all users in the system including customers, vehicle owners, and staff.</p>
+                        <a href="/admin/users" class="btn btn-users register-btn w-100">
+                            <i class="fas fa-users me-2"></i>Manage Users
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Booking Management -->
+            <div class="col-lg-4 col-md-6">
+                <div class="card management-card">
+                    <div class="card-body text-center p-4">
+                        <div class="card-icon bookings-icon">
+                            <i class="fas fa-calendar-check"></i>
+                        </div>
+                        <h4 class="card-title text-info">Booking Management</h4>
+                        <p class="card-text text-muted mb-4">View all bookings made by customers, including status, dates, and vehicle information.</p>
+                        <a href="/admin/bookings" class="btn btn-bookings register-btn w-100">
+                            <i class="fas fa-calendar-alt me-2"></i>View Bookings
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Payment Management -->
+            <div class="col-lg-4 col-md-6">
+                <div class="card management-card">
+                    <div class="card-body text-center p-4">
+                        <div class="card-icon payments-icon">
+                            <i class="fas fa-money-bill-wave"></i>
+                        </div>
+                        <h4 class="card-title text-warning">Payment Management</h4>
+                        <p class="card-text text-muted mb-4">View all payments processed in the system, including amounts, methods, and status.</p>
+                        <a href="/admin/payments" class="btn btn-payments register-btn w-100">
+                            <i class="fas fa-credit-card me-2"></i>View Payments
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Stats Section -->
+        <div class="row g-4 mb-5">
+            <div class="col-lg-12">
+                <div class="card management-card">
+                    <div class="card-body p-4">
+                        <h5 class="card-title mb-4">
+                            <i class="fas fa-chart-bar me-2"></i>System Overview
+                        </h5>
+                        <div class="row text-center">
+                            <div class="col-md-3">
+                                <div class="p-3">
+                                    <i class="fas fa-users fa-2x text-success mb-2"></i>
+                                    <h4 class="text-success">Staff</h4>
+                                    <p class="text-muted">Registered Staff Members</p>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="p-3">
+                                    <i class="fas fa-shield-alt fa-2x text-info mb-2"></i>
+                                    <h4 class="text-info">Insurance</h4>
+                                    <p class="text-muted">Insurance Officers</p>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="p-3">
+                                    <i class="fas fa-chart-line fa-2x text-dark mb-2"></i>
+                                    <h4 class="text-dark">Finance</h4>
+                                    <p class="text-muted">Financial Executives</p>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="p-3">
+                                    <i class="fas fa-user-shield fa-2x text-danger mb-2"></i>
+                                    <h4 class="text-danger">Admins</h4>
+                                    <p class="text-muted">System Administrators</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Actions Section -->
+        <div class="row justify-content-center">
+            <div class="col-lg-6 text-center">
+                <div class="d-flex gap-3 justify-content-center">
+                    <a href="/home" class="btn btn-outline-light btn-lg">
+                        <i class="fas fa-home me-2"></i>Home
+                    </a>
+                    <a href="/logout" class="logout-btn btn-lg">
+                        <i class="fas fa-sign-out-alt me-2"></i>Logout
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

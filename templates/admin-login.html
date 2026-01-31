@@ -1,0 +1,475 @@
+<!-- templates/admin-login.html -->
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AutoLanka Rentals - Administrator Login</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-dark: #2c3e50;
+            --primary-light: #3498db;
+            --customer-color: #2ecc71;
+            --staff-color: #3498db;
+            --accent-color: #e67e22;
+            --card-bg: rgba(255, 255, 255, 0.92);
+            --header-gradient-start: #2c3e50;
+            --header-gradient-end: #4a6484;
+        }
+
+        body {
+            background: linear-gradient(135deg, var(--header-gradient-start) 0%, var(--header-gradient-end) 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            padding: 20px 0;
+            position: relative;
+            overflow-x: hidden;
+            margin: 0;
+        }
+
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiPjxkZWZzPjxwYXR0ZXJuIGlkPSJwYXR0ZXJuIiB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHBhdHRlcm5Vbml0cz0idXNlclNwYWNlT25Vc2UiIHBhdHRlcm5UcmFuc2Zvcm09InJvdGF0ZSg0NSkiPjxjaXJjbGUgY3g9IjIwIiBjeT0iMjAiIHI9IjAuNSIgZmlsbD0iI2ZmZiIgZmlsbC1vcGFjaXR5PSIwLjEiLz48L3BhdHRlcm4+PC9kZWZzPjxyZWN0IHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIGZpbGw9InVybCgjcGF0dGVybikiLz48L3N2Zz4=');
+            opacity: 0.1;
+        }
+
+        .selection-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(15px);
+            border-radius: 25px;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.25);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            overflow: hidden;
+            position: relative;
+            z-index: 2;
+            max-width: 1200px;
+            margin: 20px auto;
+        }
+
+        .portal-header {
+            background: linear-gradient(135deg, var(--header-gradient-start), var(--primary-light));
+            color: white;
+            text-align: center;
+            padding: 2.5rem 2rem;
+            margin: -1.5rem -1.5rem 1.5rem -1.5rem;
+            border-radius: 25px 25px 0 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .portal-header::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 70%);
+            transform: rotate(30deg);
+        }
+
+        .portal-icon {
+            font-size: 3.5rem;
+            margin-bottom: 1rem;
+            text-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        .portal-section {
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            border: none;
+            position: relative;
+            z-index: 1;
+        }
+
+        .portal-section:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+        }
+
+        .portal-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+        }
+
+        .customer-portal::before { background: linear-gradient(90deg, var(--customer-color), #27ae60); }
+        .staff-portal::before { background: linear-gradient(90deg, var(--staff-color), #2980b9); }
+
+        .portal-title {
+            font-weight: 700;
+            margin-bottom: 0.8rem;
+            font-size: 1.5rem;
+            color: var(--primary-dark);
+            text-align: center;
+        }
+
+        .portal-subtitle {
+            text-align: center;
+            margin-bottom: 1.5rem;
+            color: #6c757d;
+        }
+
+        .portal-description {
+            font-size: 0.95rem;
+            line-height: 1.6;
+            margin-bottom: 1.5rem;
+            color: #7f8c8d;
+            text-align: center;
+        }
+
+        .portal-btn {
+            border-radius: 30px;
+            padding: 14px 30px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            border: none;
+            font-size: 1.05rem;
+            letter-spacing: 0.5px;
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+            width: 100%;
+            max-width: 300px;
+            margin: 0 auto;
+        }
+
+        .portal-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, rgba(255,255,255,0.2), rgba(255,255,255,0));
+            z-index: -1;
+            transition: all 0.3s ease;
+        }
+
+        .portal-btn:hover {
+            transform: translateY(-3px);
+            text-decoration: none;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+        }
+
+        .portal-btn:hover::before {
+            background: linear-gradient(45deg, rgba(255,255,255,0.3), rgba(255,255,255,0.1));
+        }
+
+        .customer-btn { 
+            background: linear-gradient(135deg, var(--customer-color), #27ae60);
+            box-shadow: 0 5px 15px rgba(46, 204, 113, 0.4);
+            color: white;
+        }
+        
+        .staff-btn { 
+            background: linear-gradient(135deg, var(--staff-color), #2980b9);
+            box-shadow: 0 5px 15px rgba(52, 152, 219, 0.4);
+            color: white;
+        }
+
+        .back-link {
+            display: block;
+            text-align: center;
+            margin-top: 1.5rem;
+            color: #7f8c8d;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            padding: 12px;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.7);
+        }
+
+        .back-link:hover {
+            color: var(--primary-light);
+            text-decoration: none;
+            background: rgba(255, 255, 255, 0.9);
+            transform: translateY(-2px);
+        }
+        
+        .section-title {
+            position: relative;
+            padding-bottom: 12px;
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+            text-align: center;
+        }
+        
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 3px;
+            background: var(--accent-color);
+            border-radius: 2px;
+        }
+        
+        .card-subtitle {
+            font-size: 1rem;
+            opacity: 0.9;
+            margin-bottom: 1.5rem;
+            text-align: center;
+            color: rgba(255, 255, 255, 0.9);
+        }
+        
+        .role-description {
+            text-align: center;
+            margin-bottom: 2rem;
+            color: #7f8c8d;
+        }
+        
+        /* Form styling */
+        .form-floating label {
+            color: #6c757d;
+            font-weight: 500;
+        }
+
+        .form-control {
+            border: 2px solid #e9ecef;
+            border-radius: 12px;
+            padding: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus {
+            border-color: var(--primary-dark);
+            box-shadow: 0 0 0 0.2rem rgba(44, 62, 80, 0.25);
+        }
+
+        .btn-admin-login {
+            background: linear-gradient(135deg, var(--primary-dark), #34495e);
+            border: none;
+            border-radius: 12px;
+            padding: 15px 30px;
+            font-weight: 600;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+            width: 100%;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .btn-admin-login:hover {
+            background: linear-gradient(135deg, #34495e, var(--primary-dark));
+            transform: translateY(-3px);
+            box-shadow: 0 12px 25px rgba(44, 62, 80, 0.4);
+        }
+
+        .alert {
+            border-radius: 12px;
+            border: none;
+            font-weight: 500;
+        }
+
+        .security-notice {
+            background: rgba(231, 76, 60, 0.1);
+            border: 1px solid rgba(231, 76, 60, 0.3);
+            border-radius: 12px;
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+            color: #e74c3c;
+            font-size: 0.9rem;
+            text-align: center;
+        }
+        
+        .delete-account-link {
+            display: block;
+            text-align: center;
+            margin-top: 1rem;
+            color: #e74c3c;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        
+        .delete-account-link:hover {
+            color: #c0392b;
+            text-decoration: underline;
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .portal-header {
+                padding: 2rem 1.5rem;
+            }
+            
+            .portal-icon {
+                font-size: 3rem;
+            }
+            
+            .section-title {
+                font-size: 1.3rem;
+            }
+            
+            .card-body {
+                padding: 1.5rem !important;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="container-fluid">
+    <div class="row justify-content-center">
+        <div class="col-12">
+            <div class="card selection-card">
+                <div class="card-body p-4 p-md-5">
+                    <div class="portal-header">
+                        <i class="fas fa-user-shield portal-icon"></i>
+                        <h1 class="mb-2">Administrator Access</h1>
+                        <p class="mb-0 card-subtitle">Secure System Management Portal</p>
+                    </div>
+
+                    <div class="text-center mb-4">
+                        <h3 class="section-title">Admin Login</h3>
+                        <p class="role-description">Restricted Access: This portal is reserved for authorized system administrators only</p>
+                    </div>
+
+                    <!-- Admin Portal Section -->
+                    <div class="portal-section staff-portal">
+                        <!-- Security Notice -->
+                        <div class="security-notice">
+                            <i class="fas fa-shield-alt me-2"></i>
+                            <strong>Restricted Access:</strong> This portal is reserved for authorized system administrators only.
+                        </div>
+
+                        <!-- Alert Messages -->
+                        <div th:if="${error}" class="alert alert-danger" role="alert">
+                            <i class="fas fa-exclamation-triangle me-2"></i>
+                            <span th:text="${error}"></span>
+                        </div>
+
+                        <div th:if="${success}" class="alert alert-success" role="alert">
+                            <i class="fas fa-check-circle me-2"></i>
+                            <span th:text="${success}"></span>
+                        </div>
+
+                        <!-- Login Form -->
+                        <form th:action="@{/admin-login}" th:object="${loginRequest}" method="post">
+                            <!-- Admin Code Field -->
+                            <div class="form-floating mb-3">
+                                <input type="text"
+                                       class="form-control"
+                                       id="username"
+                                       th:field="*{username}"
+                                       placeholder="Administrator Code"
+                                       required
+                                       autocomplete="username">
+                                <label for="username">
+                                    <i class="fas fa-id-badge me-2"></i>Email or Username
+                                </label>
+                                <div th:if="${#fields.hasErrors('username')}" class="text-danger small mt-1">
+                                    <span th:errors="*{username}"></span>
+                                </div>
+                            </div>
+
+                            <!-- Password Field -->
+                            <div class="form-floating mb-4">
+                                <input type="password"
+                                       class="form-control"
+                                       id="password"
+                                       th:field="*{password}"
+                                       placeholder="Password"
+                                       required
+                                       autocomplete="current-password">
+                                <label for="password">
+                                    <i class="fas fa-lock me-2"></i>Password
+                                </label>
+                                <div th:if="${#fields.hasErrors('password')}" class="text-danger small mt-1">
+                                    <span th:errors="*{password}"></span>
+                                </div>
+                            </div>
+
+                            <!-- Remember Me -->
+                            <div class="form-check mb-4">
+                                <input class="form-check-input" type="checkbox" id="rememberMe" name="rememberMe">
+                                <label class="form-check-label" for="rememberMe">
+                                    <i class="fas fa-clock me-1"></i>Keep me signed in
+                                </label>
+                            </div>
+
+                            <!-- Login Button -->
+                            <div class="d-grid gap-2 mb-3">
+                                <button type="submit" class="btn btn-primary btn-admin-login">
+                                    <i class="fas fa-sign-in-alt me-2"></i>Access Admin Panel
+                                </button>
+                            </div>
+                            
+                            <!-- Forgot Password Link -->
+                            <div class="text-center mb-2">
+                                <a href="/admin-forgot-password" class="text-muted text-decoration-none">
+                                    <small><i class="fas fa-key me-1"></i>Forgot Password?</small>
+                                </a>
+                            </div>
+                            
+                            <!-- Delete Account Link -->
+                            <a href="/admin-delete" class="delete-account-link">
+                                <i class="fas fa-trash-alt me-2"></i>Delete Account
+                            </a>
+                        </form>
+
+                        <!-- System Info -->
+                        <div class="text-center mt-4">
+                            <small class="text-muted">
+                                <i class="fas fa-shield-alt me-1"></i>
+                                Secured by AutoLanka Security Protocol
+                            </small>
+                        </div>
+                    </div>
+
+                    <a href="/user-selection" class="back-link">
+                        <i class="fas fa-arrow-left me-2"></i>Back to User Selection
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    // Auto-hide alerts after 5 seconds
+    setTimeout(function() {
+        const alerts = document.querySelectorAll('.alert');
+        alerts.forEach(function(alert) {
+            alert.style.opacity = '0';
+            setTimeout(() => alert.remove(), 300);
+        });
+    }, 5000);
+
+    // Security enhancement - clear form on page unload
+    window.addEventListener('beforeunload', function() {
+        document.getElementById('username').value = '';
+        document.getElementById('password').value = '';
+    });
+</script>
+</body>
+</html>

@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AutoLanka - Admin User Management</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+        }
+
+        body {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            min-height: 100vh;
+        }
+
+        .dashboard-header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            margin-bottom: 2rem;
+            padding: 2rem;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .management-card {
+            background: white;
+            border-radius: 15px;
+            border: none;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            height: 100%;
+        }
+
+        .table-container {
+            background: white;
+            border-radius: 15px;
+            padding: 2rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+        }
+
+        .action-btn {
+            padding: 5px 10px;
+            margin: 2px;
+        }
+
+        .dashboard-title {
+            color: var(--primary-color);
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .dashboard-subtitle {
+            color: #7f8c8d;
+            font-size: 1.2rem;
+        }
+        
+        .status-active {
+            background-color: #d4edda;
+            color: #155724;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-weight: bold;
+        }
+        
+        .status-inactive {
+            background-color: #f8d7da;
+            color: #721c24;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-weight: bold;
+        }
+        
+        .status-suspended {
+            background-color: #fff3cd;
+            color: #856404;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container py-5">
+        <!-- Dashboard Header -->
+        <div class="dashboard-header">
+            <i class="fas fa-users-cog fa-4x text-primary mb-3"></i>
+            <h1 class="dashboard-title">User Management</h1>
+            <p class="dashboard-subtitle">View and manage all users in the system</p>
+        </div>
+
+        <!-- Flash Messages -->
+        <div th:if="${message}" class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="fas fa-check-circle me-2"></i>
+            <span th:text="${message}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        
+        <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="fas fa-exclamation-circle me-2"></i>
+            <span th:text="${error}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+
+        <!-- Users Table -->
+        <div class="table-container">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h3><i class="fas fa-users me-2"></i>All Users</h3>
+                <a href="/admin/dashboard" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left me-2"></i>Back to Dashboard
+                </a>
+            </div>
+            
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>ID</th>
+                            <th>Username</th>
+                            <th>Email</th>
+                            <th>Full Name</th>
+                            <th>Phone</th>
+                            <th>User Type</th>
+                            <th>Status</th>
+                            <th>Created Date</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="user : ${users}">
+                            <td th:text="${user.userId}"></td>
+                            <td th:text="${user.username}"></td>
+                            <td th:text="${user.email}"></td>
+                            <td th:text="${user.firstName + ' ' + user.lastName}"></td>
+                            <td th:text="${user.phone}"></td>
+                            <td>
+                                <span th:if="${user.userType.name() == 'CUSTOMER'}" class="badge bg-primary">Customer</span>
+                                <span th:if="${user.userType.name() == 'VEHICLE_OWNER'}" class="badge bg-success">Vehicle Owner</span>
+                                <span th:if="${user.userType.name() == 'STAFF'}" class="badge bg-info">Staff</span>
+                                <span th:if="${user.userType.name() == 'INSURANCE_OFFICER'}" class="badge bg-warning">Insurance Officer</span>
+                                <span th:if="${user.userType.name() == 'FINANCIAL_EXECUTIVE'}" class="badge bg-dark">Financial Executive</span>
+                                <span th:if="${user.userType.name() == 'ADMIN'}" class="badge bg-danger">Admin</span>
+                            </td>
+                            <td>
+                                <span th:if="${user.status == 'ACTIVE'}" class="status-active">Active</span>
+                                <span th:if="${user.status == 'INACTIVE'}" class="status-inactive">Inactive</span>
+                                <span th:if="${user.status == 'SUSPENDED'}" class="status-suspended">Suspended</span>
+                            </td>
+                            <td th:text="${#temporals.format(user.createdDate, 'yyyy-MM-dd HH:mm')}"></td>
+                            <td>
+                                <form th:action="@{/admin/delete-user}" method="post" style="display:inline;">
+                                    <input type="hidden" name="userId" th:value="${user.userId}" />
+                                    <button type="submit" class="btn btn-danger btn-sm action-btn" 
+                                            onclick="return confirm('Are you sure you want to delete this user? This action cannot be undone.')">
+                                        <i class="fas fa-trash"></i> Delete
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

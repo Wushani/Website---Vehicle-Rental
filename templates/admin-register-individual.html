@@ -1,0 +1,614 @@
+<!-- templates/admin-register-individual.html -->
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Registration - AutoLanka</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-dark: #2c3e50;
+            --primary-light: #3498db;
+            --customer-color: #2ecc71;
+            --staff-color: #3498db;
+            --accent-color: #e67e22;
+            --card-bg: rgba(255, 255, 255, 0.92);
+            --header-gradient-start: #2c3e50;
+            --header-gradient-end: #4a6484;
+        }
+
+        body {
+            background: linear-gradient(135deg, var(--header-gradient-start) 0%, var(--header-gradient-end) 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            padding: 20px 0;
+            position: relative;
+            overflow-x: hidden;
+            margin: 0;
+        }
+
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiPjxkZWZzPjxwYXR0ZXJuIGlkPSJwYXR0ZXJuIiB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHBhdHRlcm5Vbml0cz0idXNlclNwYWNlT25Vc2UiIHBhdHRlcm5UcmFuc2Zvcm09InJvdGF0ZSg0NSkiPjxjaXJjbGUgY3g9IjIwIiBjeT0iMjAiIHI9IjAuNSIgZmlsbD0iI2ZmZiIgZmlsbC1vcGFjaXR5PSIwLjEiLz48L3BhdHRlcm4+PC9kZWZzPjxyZWN0IHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIGZpbGw9InVybCgjcGF0dGVybikiLz48L3N2Zz4=');
+            opacity: 0.1;
+        }
+
+        .selection-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(15px);
+            border-radius: 25px;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.25);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            overflow: hidden;
+            position: relative;
+            z-index: 2;
+            max-width: 1200px;
+            margin: 20px auto;
+        }
+
+        .portal-header {
+            background: linear-gradient(135deg, var(--header-gradient-start), var(--primary-light));
+            color: white;
+            text-align: center;
+            padding: 2.5rem 2rem;
+            margin: -1.5rem -1.5rem 1.5rem -1.5rem;
+            border-radius: 25px 25px 0 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .portal-header::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 70%);
+            transform: rotate(30deg);
+        }
+
+        .portal-icon {
+            font-size: 3.5rem;
+            margin-bottom: 1rem;
+            text-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        .portal-section {
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            border: none;
+            position: relative;
+            z-index: 1;
+        }
+
+        .portal-section:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+        }
+
+        .portal-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+        }
+
+        .customer-portal::before { background: linear-gradient(90deg, var(--customer-color), #27ae60); }
+        .staff-portal::before { background: linear-gradient(90deg, var(--staff-color), #2980b9); }
+
+        .portal-title {
+            font-weight: 700;
+            margin-bottom: 0.8rem;
+            font-size: 1.5rem;
+            color: var(--primary-dark);
+            text-align: center;
+        }
+
+        .portal-subtitle {
+            text-align: center;
+            margin-bottom: 1.5rem;
+            color: #6c757d;
+        }
+
+        .portal-description {
+            font-size: 0.95rem;
+            line-height: 1.6;
+            margin-bottom: 1.5rem;
+            color: #7f8c8d;
+            text-align: center;
+        }
+
+        .portal-btn {
+            border-radius: 30px;
+            padding: 14px 30px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            border: none;
+            font-size: 1.05rem;
+            letter-spacing: 0.5px;
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+            width: 100%;
+            max-width: 300px;
+            margin: 0 auto;
+        }
+
+        .portal-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, rgba(255,255,255,0.2), rgba(255,255,255,0));
+            z-index: -1;
+            transition: all 0.3s ease;
+        }
+
+        .portal-btn:hover {
+            transform: translateY(-3px);
+            text-decoration: none;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+        }
+
+        .portal-btn:hover::before {
+            background: linear-gradient(45deg, rgba(255,255,255,0.3), rgba(255,255,255,0.1));
+        }
+
+        .customer-btn { 
+            background: linear-gradient(135deg, var(--customer-color), #27ae60);
+            box-shadow: 0 5px 15px rgba(46, 204, 113, 0.4);
+            color: white;
+        }
+        
+        .staff-btn { 
+            background: linear-gradient(135deg, var(--staff-color), #2980b9);
+            box-shadow: 0 5px 15px rgba(52, 152, 219, 0.4);
+            color: white;
+        }
+
+        .back-link {
+            display: block;
+            text-align: center;
+            margin-top: 1.5rem;
+            color: #7f8c8d;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            padding: 12px;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.7);
+        }
+
+        .back-link:hover {
+            color: var(--primary-light);
+            text-decoration: none;
+            background: rgba(255, 255, 255, 0.9);
+            transform: translateY(-2px);
+        }
+        
+        .section-title {
+            position: relative;
+            padding-bottom: 12px;
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+            text-align: center;
+        }
+        
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 3px;
+            background: var(--accent-color);
+            border-radius: 2px;
+        }
+        
+        .card-subtitle {
+            font-size: 1rem;
+            opacity: 0.9;
+            margin-bottom: 1.5rem;
+            text-align: center;
+            color: rgba(255, 255, 255, 0.9);
+        }
+        
+        .role-description {
+            text-align: center;
+            margin-bottom: 2rem;
+            color: #7f8c8d;
+        }
+        
+        /* Form styling */
+        .section-header {
+            background: #f8f9fa;
+            padding: 1rem;
+            border-radius: 12px;
+            margin: 1.5rem 0 1rem 0;
+            border-left: 4px solid #667eea;
+            font-weight: 600;
+            color: #495057;
+            text-align: center;
+        }
+
+        .form-control {
+            border: 2px solid #e9ecef;
+            border-radius: 12px;
+            padding: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+        }
+
+        .btn-admin-register {
+            background: linear-gradient(135deg, #667eea, #e17055);
+            border: none;
+            border-radius: 12px;
+            padding: 15px 30px;
+            font-weight: 600;
+            font-size: 1.1rem;
+            width: 100%;
+            transition: all 0.3s ease;
+        }
+
+        .btn-admin-register:hover {
+            background: linear-gradient(135deg, #e17055, #667eea);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .alert {
+            border-radius: 12px;
+            border: none;
+            font-weight: 500;
+        }
+
+        .welcome-benefits {
+            background: rgba(225, 112, 85, 0.1);
+            border: 1px solid rgba(225, 112, 85, 0.3);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .benefit-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 0.5rem;
+            color: #e17055;
+        }
+
+        .benefit-item i {
+            margin-right: 0.75rem;
+            width: 20px;
+        }
+
+        .security-notice {
+            background: rgba(255, 193, 7, 0.1);
+            border: 1px solid rgba(255, 193, 7, 0.3);
+            border-radius: 12px;
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+            color: #856404;
+            text-align: center;
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .portal-header {
+                padding: 2rem 1.5rem;
+            }
+            
+            .portal-icon {
+                font-size: 3rem;
+            }
+            
+            .section-title {
+                font-size: 1.3rem;
+            }
+            
+            .card-body {
+                padding: 1.5rem !important;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="container-fluid">
+    <div class="row justify-content-center">
+        <div class="col-12">
+            <div class="card selection-card">
+                <div class="card-body p-4 p-md-5">
+                    <div class="portal-header">
+                        <i class="fas fa-shield-alt portal-icon"></i>
+                        <h1 class="mb-2">Join AutoLanka Admin Team</h1>
+                        <p class="mb-0 card-subtitle">Create administrative account with full system access</p>
+                    </div>
+
+                    <div class="text-center mb-4">
+                        <h3 class="section-title">Admin Registration</h3>
+                        <p class="role-description">Create administrative accounts for authorized system administrators</p>
+                    </div>
+
+                    <!-- Admin Portal Section -->
+                    <div class="portal-section staff-portal">
+                        <!-- Security Notice -->
+                        <div class="security-notice">
+                            <i class="fas fa-exclamation-triangle me-2"></i>
+                            <strong>Security Notice:</strong> Admin accounts have full system privileges. Only create accounts for authorized personnel.
+                        </div>
+
+                        <!-- Benefits Section -->
+                        <div class="welcome-benefits">
+                            <h6 class="mb-3" style="color: #e17055;">
+                                <i class="fas fa-star me-2"></i>Admin Benefits
+                            </h6>
+                            <div class="benefit-item">
+                                <i class="fas fa-shield-alt"></i>
+                                <span>Complete system administration access</span>
+                            </div>
+                            <div class="benefit-item">
+                                <i class="fas fa-users-cog"></i>
+                                <span>User management and oversight</span>
+                            </div>
+                            <div class="benefit-item">
+                                <i class="fas fa-chart-bar"></i>
+                                <span>Advanced analytics and reporting</span>
+                            </div>
+                            <div class="benefit-item">
+                                <i class="fas fa-cogs"></i>
+                                <span>System configuration and maintenance</span>
+                            </div>
+                        </div>
+
+                        <!-- Alert Messages -->
+                        <div th:if="${errorMessage}" class="alert alert-danger" role="alert">
+                            <i class="fas fa-exclamation-triangle me-2"></i>
+                            <span th:text="${errorMessage}"></span>
+                        </div>
+
+                        <div th:if="${successMessage}" class="alert alert-success" role="alert">
+                            <i class="fas fa-check-circle me-2"></i>
+                            <span th:text="${successMessage}"></span>
+                        </div>
+
+                        <!-- Registration Form -->
+                        <form th:action="@{/admin/register/admin}" method="post" th:object="${registrationRequest}">
+                            <!-- Basic Information -->
+                            <div class="section-header">
+                                <i class="fas fa-user-circle me-2"></i>Basic Information
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-floating mb-3">
+                                        <input type="text" class="form-control" id="firstName" th:field="*{firstName}" placeholder="First Name" required>
+                                        <label for="firstName"><i class="fas fa-user me-2"></i>First Name</label>
+                                        <div th:if="${#fields.hasErrors('firstName')}" class="text-danger small mt-1">
+                                            <span th:errors="*{firstName}"></span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-floating mb-3">
+                                        <input type="text" class="form-control" id="lastName" th:field="*{lastName}" placeholder="Last Name" required>
+                                        <label for="lastName"><i class="fas fa-user me-2"></i>Last Name</label>
+                                        <div th:if="${#fields.hasErrors('lastName')}" class="text-danger small mt-1">
+                                            <span th:errors="*{lastName}"></span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-floating mb-3">
+                                <input type="text" class="form-control" id="username" th:field="*{username}" placeholder="Username" required>
+                                <label for="username"><i class="fas fa-at me-2"></i>Username</label>
+                                <div th:if="${#fields.hasErrors('username')}" class="text-danger small mt-1">
+                                    <span th:errors="*{username}"></span>
+                                </div>
+                                <div class="form-text text-muted">
+                                    Choose a unique username (3-50 characters, letters, numbers, and underscores only)
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-floating mb-3">
+                                        <input type="email" class="form-control" id="email" th:field="*{email}" placeholder="Email Address" required>
+                                        <label for="email"><i class="fas fa-envelope me-2"></i>Email Address</label>
+                                        <div th:if="${#fields.hasErrors('email')}" class="text-danger small mt-1">
+                                            <span th:errors="*{email}"></span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-floating mb-3">
+                                        <input type="tel" class="form-control" id="phone" th:field="*{phone}" placeholder="Phone Number" required>
+                                        <label for="phone"><i class="fas fa-phone me-2"></i>Phone Number</label>
+                                        <div th:if="${#fields.hasErrors('phone')}" class="text-danger small mt-1">
+                                            <span th:errors="*{phone}"></span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Account Information -->
+                            <div class="section-header">
+                                <i class="fas fa-key me-2"></i>Account Information
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-floating mb-3">
+                                        <input type="password" class="form-control" id="password" th:field="*{password}" placeholder="Password" required>
+                                        <label for="password"><i class="fas fa-lock me-2"></i>Password</label>
+                                        <div th:if="${#fields.hasErrors('password')}" class="text-danger small mt-1">
+                                            <span th:errors="*{password}"></span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-floating mb-3">
+                                        <input type="password" class="form-control" id="confirmPassword" th:field="*{confirmPassword}" placeholder="Confirm Password" required>
+                                        <label for="confirmPassword"><i class="fas fa-lock me-2"></i>Confirm Password</label>
+                                        <div th:if="${#fields.hasErrors('confirmPassword')}" class="text-danger small mt-1">
+                                            <span th:errors="*{confirmPassword}"></span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Administrator Specific Information -->
+                            <div class="section-header">
+                                <i class="fas fa-shield-alt me-2"></i>Administrator Specific Information
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-floating mb-3">
+                                        <input type="text" class="form-control" id="specialCode" th:field="*{specialCode}" placeholder="Admin Code" required>
+                                        <label for="specialCode"><i class="fas fa-key me-2"></i>Admin Code</label>
+                                        <div th:if="${#fields.hasErrors('specialCode')}" class="text-danger small mt-1">
+                                            <span th:errors="*{specialCode}"></span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-floating mb-3">
+                                        <select class="form-select" id="adminLevel" th:field="*{adminLevel}" required>
+                                            <option value="">Select Level</option>
+                                            <option value="Super Admin">Super Admin</option>
+                                            <option value="System Admin">System Admin</option>
+                                            <option value="Department Admin">Department Admin</option>
+                                            <option value="Regional Admin">Regional Admin</option>
+                                        </select>
+                                        <label for="adminLevel"><i class="fas fa-layer-group me-2"></i>Admin Level</label>
+                                        <div th:if="${#fields.hasErrors('adminLevel')}" class="text-danger small mt-1">
+                                            <span th:errors="*{adminLevel}"></span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-floating mb-3">
+                                        <select class="form-select" id="department" th:field="*{department}" required>
+                                            <option value="">Select Department</option>
+                                            <option value="IT & Systems">IT & Systems</option>
+                                            <option value="Operations">Operations</option>
+                                            <option value="Finance">Finance</option>
+                                            <option value="Human Resources">Human Resources</option>
+                                            <option value="Customer Service">Customer Service</option>
+                                            <option value="Fleet Management">Fleet Management</option>
+                                            <option value="Security">Security</option>
+                                        </select>
+                                        <label for="department"><i class="fas fa-building me-2"></i>Department</label>
+                                        <div th:if="${#fields.hasErrors('department')}" class="text-danger small mt-1">
+                                            <span th:errors="*{department}"></span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-floating mb-3">
+                                        <select class="form-select" id="authorizationLevel" th:field="*{authorizationLevel}" required>
+                                            <option value="">Select Authorization</option>
+                                            <option value="Full Access">Full Access</option>
+                                            <option value="Limited Access">Limited Access</option>
+                                            <option value="Read Only">Read Only</option>
+                                            <option value="Department Specific">Department Specific</option>
+                                        </select>
+                                        <label for="authorizationLevel"><i class="fas fa-user-shield me-2"></i>Authorization Level</label>
+                                        <div th:if="${#fields.hasErrors('authorizationLevel')}" class="text-danger small mt-1">
+                                            <span th:errors="*{authorizationLevel}"></span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Register Button -->
+                            <div class="d-grid gap-2 mb-3">
+                                <button type="submit" class="btn btn-primary btn-admin-register">
+                                    <i class="fas fa-shield-alt me-2"></i>Create Admin Account
+                                </button>
+                            </div>
+                        </form>
+
+                        <!-- Footer Links -->
+                        <hr class="my-4">
+                        <div class="text-center">
+                            <a href="/admin/dashboard" class="btn btn-outline-primary">
+                                <i class="fas fa-arrow-left me-2"></i>Back to Dashboard
+                            </a>
+                        </div>
+                    </div>
+
+                    <a href="/user-selection" class="back-link">
+                        <i class="fas fa-arrow-left me-2"></i>Back to User Selection
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    // Password confirmation validation
+    const password = document.getElementById('password');
+    const confirmPassword = document.getElementById('confirmPassword');
+
+    function validatePassword() {
+        if (password.value !== confirmPassword.value) {
+            confirmPassword.setCustomValidity("Passwords don't match");
+        } else {
+            confirmPassword.setCustomValidity('');
+        }
+    }
+
+    password.addEventListener('change', validatePassword);
+    confirmPassword.addEventListener('keyup', validatePassword);
+
+    // Auto-hide alerts after 5 seconds
+    setTimeout(function() {
+        const alerts = document.querySelectorAll('.alert');
+        alerts.forEach(function(alert) {
+            alert.style.opacity = '0';
+            setTimeout(() => alert.remove(), 300);
+        });
+    }, 5000);
+</script>
+</body>
+</html>

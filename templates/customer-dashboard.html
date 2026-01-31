@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AutoLanka - Customer Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-dark: #2c3e50;
+            --primary-light: #3498db;
+            --customer-color: #2ecc71;
+            --staff-color: #3498db;
+            --accent-color: #e67e22;
+            --card-bg: rgba(255, 255, 255, 0.92);
+            --header-gradient-start: #2c3e50;
+            --header-gradient-end: #4a6484;
+        }
+
+        body {
+            background: linear-gradient(135deg, var(--header-gradient-start) 0%, var(--header-gradient-end) 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            padding: 20px 0;
+            position: relative;
+            overflow-x: hidden;
+            margin: 0;
+        }
+
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiPjxkZWZzPjxwYXR0ZXJuIGlkPSJwYXR0ZXJuIiB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHBhdHRlcm5Vbml0cz0idXNlclNwYWNlT25Vc2UiIHBhdHRlcm5UcmFuc2Zvcm09InJvdGF0ZSg0NSkiPjxjaXJjbGUgY3g9IjIwIiBjeT0iMjAiIHI9IjAuNSIgZmlsbD0iI2ZmZiIgZmlsbC1vcGFjaXR5PSIwLjEiLz48L3BhdHRlcm4+PC9kZWZzPjxyZWN0IHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIGZpbGw9InVybCgjcGF0dGVybikiLz48L3N2Zz4=');
+            opacity: 0.1;
+        }
+
+        .selection-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(15px);
+            border-radius: 25px;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.25);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            overflow: hidden;
+            position: relative;
+            z-index: 2;
+            max-width: 1200px;
+            margin: 20px auto;
+        }
+
+        .portal-header {
+            background: linear-gradient(135deg, var(--header-gradient-start), var(--primary-light));
+            color: white;
+            text-align: center;
+            padding: 2.5rem 2rem;
+            margin: -1.5rem -1.5rem 1.5rem -1.5rem;
+            border-radius: 25px 25px 0 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .portal-header::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 70%);
+            transform: rotate(30deg);
+        }
+
+        .portal-icon {
+            font-size: 3.5rem;
+            margin-bottom: 1rem;
+            text-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        .portal-section {
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            border: none;
+            position: relative;
+            z-index: 1;
+        }
+
+        .portal-section:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+        }
+
+        .portal-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+        }
+
+        .customer-portal::before { background: linear-gradient(90deg, var(--customer-color), #27ae60); }
+        .staff-portal::before { background: linear-gradient(90deg, var(--staff-color), #2980b9); }
+
+        .portal-title {
+            font-weight: 700;
+            margin-bottom: 0.8rem;
+            font-size: 1.5rem;
+            color: var(--primary-dark);
+            text-align: center;
+        }
+
+        .portal-subtitle {
+            text-align: center;
+            margin-bottom: 1.5rem;
+            color: #6c757d;
+        }
+
+        .portal-description {
+            font-size: 0.95rem;
+            line-height: 1.6;
+            margin-bottom: 1.5rem;
+            color: #7f8c8d;
+            text-align: center;
+        }
+
+        .portal-btn {
+            border-radius: 30px;
+            padding: 14px 30px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            border: none;
+            font-size: 1.05rem;
+            letter-spacing: 0.5px;
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+            width: 100%;
+            max-width: 300px;
+            margin: 0 auto;
+        }
+
+        .portal-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, rgba(255,255,255,0.2), rgba(255,255,255,0));
+            z-index: -1;
+            transition: all 0.3s ease;
+        }
+
+        .portal-btn:hover {
+            transform: translateY(-3px);
+            text-decoration: none;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+        }
+
+        .portal-btn:hover::before {
+            background: linear-gradient(45deg, rgba(255,255,255,0.3), rgba(255,255,255,0.1));
+        }
+
+        .customer-btn { 
+            background: linear-gradient(135deg, var(--customer-color), #27ae60);
+            box-shadow: 0 5px 15px rgba(46, 204, 113, 0.4);
+            color: white;
+        }
+        
+        .staff-btn { 
+            background: linear-gradient(135deg, var(--staff-color), #2980b9);
+            box-shadow: 0 5px 15px rgba(52, 152, 219, 0.4);
+            color: white;
+        }
+
+        .back-link {
+            display: block;
+            text-align: center;
+            margin-top: 1.5rem;
+            color: #7f8c8d;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            padding: 12px;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.7);
+        }
+
+        .back-link:hover {
+            color: var(--primary-light);
+            text-decoration: none;
+            background: rgba(255, 255, 255, 0.9);
+            transform: translateY(-2px);
+        }
+        
+        .section-title {
+            position: relative;
+            padding-bottom: 12px;
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+            text-align: center;
+        }
+        
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 3px;
+            background: var(--accent-color);
+            border-radius: 2px;
+        }
+        
+        .card-subtitle {
+            font-size: 1rem;
+            opacity: 0.9;
+            margin-bottom: 1.5rem;
+            text-align: center;
+            color: rgba(255, 255, 255, 0.9);
+        }
+        
+        .role-description {
+            text-align: center;
+            margin-bottom: 2rem;
+            color: #7f8c8d;
+        }
+        
+        /* Action card styling */
+        .action-card {
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            border: none;
+            position: relative;
+            z-index: 1;
+            height: 100%;
+        }
+
+        .action-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+        }
+
+        .card-icon {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1rem;
+            font-size: 2rem;
+            color: white;
+        }
+
+        .book-icon { 
+            background: linear-gradient(135deg, var(--customer-color), #27ae60);
+            box-shadow: 0 5px 15px rgba(46, 204, 113, 0.4);
+        }
+        .payment-icon { 
+            background: linear-gradient(135deg, #17a2b8, #6f42c1);
+            box-shadow: 0 5px 15px rgba(23, 162, 184, 0.4);
+        }
+        .history-icon { 
+            background: linear-gradient(135deg, #ffc107, #fd7e14);
+            box-shadow: 0 5px 15px rgba(255, 193, 7, 0.4);
+        }
+        .feedback-icon { 
+            background: linear-gradient(135deg, #dc3545, #fd7e14);
+            box-shadow: 0 5px 15px rgba(220, 53, 69, 0.4);
+        }
+
+        .action-btn {
+            border-radius: 30px;
+            padding: 12px 20px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            border: none;
+            font-size: 0.95rem;
+            letter-spacing: 0.5px;
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+            width: 100%;
+            margin: 5px 0;
+        }
+
+        .action-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, rgba(255,255,255,0.2), rgba(255,255,255,0));
+            z-index: -1;
+            transition: all 0.3s ease;
+        }
+
+        .action-btn:hover {
+            transform: translateY(-3px);
+            text-decoration: none;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+        }
+
+        .action-btn:hover::before {
+            background: linear-gradient(45deg, rgba(255,255,255,0.3), rgba(255,255,255,0.1));
+        }
+
+        .btn-book { 
+            background: linear-gradient(135deg, var(--customer-color), #27ae60);
+            box-shadow: 0 5px 15px rgba(46, 204, 113, 0.4);
+            color: white;
+        }
+        
+        .btn-payment { 
+            background: linear-gradient(135deg, #17a2b8, #6f42c1);
+            box-shadow: 0 5px 15px rgba(23, 162, 184, 0.4);
+            color: white;
+        }
+        
+        .btn-history { 
+            background: linear-gradient(135deg, #ffc107, #fd7e14);
+            box-shadow: 0 5px 15px rgba(255, 193, 7, 0.4);
+            color: #212529;
+        }
+        
+        .btn-feedback { 
+            background: linear-gradient(135deg, #dc3545, #fd7e14);
+            box-shadow: 0 5px 15px rgba(220, 53, 69, 0.4);
+            color: white;
+        }
+
+        .logout-btn {
+            background: linear-gradient(135deg, var(--primary-dark), var(--primary-light));
+            border: none;
+            border-radius: 12px;
+            padding: 15px 30px;
+            font-weight: 600;
+            font-size: 1.1rem;
+            width: 100%;
+            transition: all 0.3s ease;
+            color: white;
+        }
+
+        .logout-btn:hover {
+            background: linear-gradient(135deg, var(--primary-light), var(--primary-dark));
+            transform: translateY(-3px);
+            box-shadow: 0 12px 25px rgba(44, 62, 80, 0.4);
+        }
+
+        .welcome-title {
+            color: white;
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .welcome-subtitle {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 1.2rem;
+            margin-bottom: 0;
+        }
+
+        .stat-card {
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            border: none;
+            position: relative;
+            z-index: 1;
+            text-align: center;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+        }
+
+        .stat-card i {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .stat-card h3 {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            color: var(--primary-dark);
+        }
+
+        .stat-card p {
+            color: #7f8c8d;
+            margin-bottom: 0;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .portal-header {
+                padding: 2rem 1.5rem;
+            }
+            
+            .portal-icon {
+                font-size: 3rem;
+            }
+            
+            .section-title {
+                font-size: 1.3rem;
+            }
+            
+            .card-body {
+                padding: 1.5rem !important;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="container-fluid">
+    <div class="row justify-content-center">
+        <div class="col-12">
+            <div class="card selection-card">
+                <div class="card-body p-4 p-md-5">
+                    <div class="portal-header">
+                        <i class="fas fa-user-circle portal-icon"></i>
+                        <h1 class="mb-2 welcome-title">Welcome, Customer!</h1>
+                        <p class="mb-0 card-subtitle" th:text="${welcomeMessage}">Manage your bookings, payments, and feedback</p>
+                    </div>
+
+                    <div class="text-center mb-4">
+                        <h3 class="section-title">Customer Dashboard</h3>
+                        <p class="role-description">Access all your vehicle rental services in one place</p>
+                    </div>
+
+                    <!-- Action Cards -->
+                    <div class="row g-4">
+                        <!-- Find Vehicle -->
+                        <div class="col-lg-3 col-md-6">
+                            <div class="action-card customer-portal">
+                                <div class="text-center">
+                                    <div class="card-icon book-icon">
+                                        <i class="fas fa-search"></i>
+                                    </div>
+                                    <h4 class="portal-title text-success">Find Vehicle</h4>
+                                    <p class="portal-subtitle">Search and filter vehicles by type and other criteria.</p>
+                                    <a href="/customer/bookings/find-vehicle" class="btn btn-success action-btn btn-book">
+                                        <i class="fas fa-search me-2"></i>Find Vehicle
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Payment Management -->
+                        <div class="col-lg-3 col-md-6">
+                            <div class="action-card customer-portal">
+                                <div class="text-center">
+                                    <div class="card-icon payment-icon">
+                                        <i class="fas fa-credit-card"></i>
+                                    </div>
+                                    <h4 class="portal-title text-info">Payments</h4>
+                                    <p class="portal-subtitle">View and manage your payment history and invoices.</p>
+                                    <a href="/customer/payments" class="btn btn-info action-btn btn-payment">
+                                        <i class="fas fa-money-check me-2"></i>View Payments
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Booking History -->
+                        <div class="col-lg-3 col-md-6">
+                            <div class="action-card customer-portal">
+                                <div class="text-center">
+                                    <div class="card-icon history-icon">
+                                        <i class="fas fa-history"></i>
+                                    </div>
+                                    <h4 class="portal-title text-warning">Booking History</h4>
+                                    <p class="portal-subtitle">Review your past and current vehicle bookings.</p>
+                                    <a href="/customer/bookings/history" class="btn btn-warning action-btn btn-history">
+                                        <i class="fas fa-book-open me-2"></i>View History
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Feedback -->
+                        <div class="col-lg-3 col-md-6">
+                            <div class="action-card customer-portal">
+                                <div class="text-center">
+                                    <div class="card-icon feedback-icon">
+                                        <i class="fas fa-comment-dots"></i>
+                                    </div>
+                                    <h4 class="portal-title text-danger">Feedback</h4>
+                                    <p class="portal-subtitle">Share your experience and provide valuable feedback.</p>
+                                    <a href="/customer/feedback" class="btn btn-danger action-btn btn-feedback mb-2">
+                                        <i class="fas fa-plus-circle me-2"></i>Submit Feedback
+                                    </a>
+                                    <a href="/customer/feedback/history" class="btn btn-outline-danger action-btn">
+                                        <i class="fas fa-history me-2"></i>View History
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Stats Section -->
+                    <div class="row g-4 mt-5">
+                        <div class="col-lg-4 col-md-6">
+                            <div class="stat-card">
+                                <i class="fas fa-car text-success"></i>
+                                <h3 th:text="${totalBookings}">5</h3>
+                                <p>Total Bookings</p>
+                            </div>
+                        </div>
+                        
+                        <div class="col-lg-4 col-md-6">
+                            <div class="stat-card">
+                                <i class="fas fa-calendar-check text-warning"></i>
+                                <h3 th:text="${upcomingBookings}">2</h3>
+                                <p>Upcoming Bookings</p>
+                            </div>
+                        </div>
+                        
+                        <div class="col-lg-4 col-md-6">
+                            <div class="stat-card">
+                                <i class="fas fa-check-circle text-primary"></i>
+                                <h3 th:text="${completedBookings}">3</h3>
+                                <p>Completed Bookings</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Logout Button -->
+                    <div class="row mt-5">
+                        <div class="col-12">
+                            <a href="/logout" class="logout-btn">
+                                <i class="fas fa-sign-out-alt me-2"></i>Logout
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
